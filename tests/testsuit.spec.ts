@@ -1,103 +1,174 @@
 import { test, expect } from '@playwright/test';
+// import * as locators from './locators';
 
-test('1. Opening root page Playwright', async ({ page }) => {
-  await page.goto('https://playwright.dev/');
-  //header has word "Playwright".
-  await expect(page.getByLabel('Main', { exact: true }).locator('b')).toContainText('Playwright');
-  //header contains logo and it's visible.
-  await expect(page.getByRole('link', { name: 'Playwright logo Playwright' })).toBeVisible();
+test('1. Visibility of cart active element on the page', async ({ page }) => {
+  const cartPage = page.getByLabel('Cart page')
+  
+  await page.goto('https://coffee-cart.app/');
+  await cartPage.click();
 });
 
-test('2. Check the presence of all mandatory elements in the header', async ({ page }) => {
-    await page.goto('https://playwright.dev/');
-    //The whole test oriented to verifying the presence of all mandatory elements in the header of the site.
-    await expect(page.getByRole('link', { name: 'Playwright logo Playwright' })).toBeVisible();
-    await expect(page.getByRole('link', { name: 'Docs' })).toBeVisible();
-    await expect(page.getByRole('link', { name: 'API', exact: true })).toBeVisible();
-    await expect(page.getByRole('button', { name: 'Node.js' })).toBeVisible();
-    await expect(page.getByRole('link', { name: 'Community' })).toBeVisible();
-    await expect(page.getByLabel('GitHub repository')).toBeVisible();
-    await expect(page.getByLabel('Discord server')).toBeVisible();
-    await expect(page.getByLabel('Switch between dark and light')).toBeVisible();
-    await expect(page.getByLabel('Search')).toBeVisible();
-  });
 
-  test('3. Testing the "Search" field with simple request', async ({ page }) => {
-    await page.goto('https://playwright.dev/');
-    await expect(page.getByRole('link', { name: 'Get started' })).toBeVisible();
-    await page.getByLabel('Search').click();
-    await page.getByPlaceholder('Search docs').fill('Installation');
-    await expect(page.getByRole('link', { name: 'Introduction​ Installation' })).toBeVisible();
-    await page.getByRole('link', { name: 'Introduction​ Installation' }).click();
-    await expect(page.getByRole('article')).toContainText('Node.js 18+');
-  });
 
-  test('4. Check supported version of Node.js for Playwright package, should be matched with version 18+', async ({ page }) => {
-    await page.goto('https://playwright.dev/');
-    await expect(page.getByRole('link', { name: 'Playwright logo Playwright' })).toBeVisible();
-    await page.getByRole('link', { name: 'Get started' }).click();
-    await page.getByRole('link', { name: 'How to install Playwright' }).click();
-    //find locator and expect selected version of node.js
-    await expect(page.getByRole('article')).toContainText('Node.js 18+');
-  });
+test('2. Cart empty and after some actions contain needed value', async ({ page }) => {
+  const cartPageLoc = page.getByLabel('Cart page');
+  const menuPageLoc = page.getByLabel('Menu page');
+  const espressoLoc = page.locator('[data-test="Espresso"]');
 
-  test('5. Check transition from installation page to "Writing tests" ', async ({ page }) => {
-    await page.goto('https://playwright.dev/');
-    await expect(page.getByRole('link', { name: 'Playwright logo Playwright' })).toBeVisible();
-    await page.getByRole('link', { name: 'Get started' }).click();
-    await expect(page.getByLabel('Docs pages').getByRole('link')).toContainText('NextWriting tests');
-    await page.getByRole('link', { name: 'Next Writing tests »' }).click();
-    await expect(page.getByRole('heading', { name: 'Writing tests' })).toBeVisible();
-    await expect(page.getByRole('link', { name: 'Previous « Installation' })).toBeVisible();
-  });
+  await page.goto('/');
+  await cartPageLoc.click();
+  await expect(page.getByRole('paragraph')).toContainText('No coffee, go add some.');
+  await menuPageLoc.click();
+  await espressoLoc.click();
+  await expect(cartPageLoc).toContainText('cart (1)');
+  await cartPageLoc.click();
+  await expect(page.locator('div').filter({ hasText: /^Espresso$/ })).toBeVisible();
+});
 
-  test('6. Check left drawer for correct transition', async ({ page }) => {
-    await page.goto('https://playwright.dev/');
-    await expect(page.getByRole('link', { name: 'Playwright logo Playwright' })).toBeVisible();
-    await page.getByRole('link', { name: 'Get started' }).click();
-    await page.getByRole('link', { name: 'Fixtures', exact: true }).click();
-    await expect(page.getByRole('heading', { name: 'Fixtures', exact: true })).toBeVisible();
-    await page.getByRole('link', { name: 'Test generator' }).click();
-    await expect(page.getByRole('heading', { name: 'Running CodegenDirect link to' })).toBeVisible();
-  });
-
-  test('7. Check items of supported languages in the Left drawer', async ({ page }) => {
-    await page.goto('https://playwright.dev/');
-    await expect(page.getByRole('link', { name: 'Playwright logo Playwright' })).toBeVisible();
-    await page.getByRole('link', { name: 'Get started' }).click();
-    await page.getByRole('link', { name: 'Supported languages' }).click();
-    await expect(page.getByRole('heading', { name: 'Supported languages' })).toBeVisible();
-    await expect(page.getByRole('heading', { name: 'JavaScript and' })).toBeVisible();
-    await expect(page.getByRole('heading', { name: 'PythonDirect link to Python' })).toBeVisible();
-    await expect(page.getByRole('heading', { name: 'JavaDirect link to Java' })).toBeVisible();
-    await expect(page.locator('#net')).toContainText('.NET');
-  });
-
-  test('8. Check transition from the right drawer to the needed section.', async ({ page }) => {
-    await page.goto('https://playwright.dev/');
-    await expect(page.getByRole('link', { name: 'Playwright logo Playwright' })).toBeVisible();
-    await page.getByRole('link', { name: 'Get started' }).click();
-    await page.getByRole('link', { name: 'Assertions', exact: true }).click();
-    await expect(page.getByRole('link', { name: 'expect.configure', exact: true })).toBeVisible();
-    await page.getByRole('link', { name: 'expect.configure', exact: true }).click();
-    await expect(page.getByRole('article')).toContainText('You can create your own pre-configured expect instance to have its own defaults such as timeout and soft.');
-  });
-
-  test('9. Check correctness of the "Stack Overflow" integration', async ({ page }) => {
-    await page.goto('https://playwright.dev/');
-    await expect(page.getByRole('link', { name: 'Playwright logo Playwright' })).toBeVisible();
-    await expect(page.getByRole('contentinfo').getByText('Community')).toBeVisible();
-    const page1Promise = page.waitForEvent('popup'); // const new page
-    await page.getByRole('link', { name: 'Stack Overflow' }).click();
-    //interaction with a new page but I haven't known about promise yet.
-    const page1 = await page1Promise;
-    await expect(page1.getByRole('heading', { name: 'Questions tagged [playwright]' })).toBeVisible();
-  });
+test('3. "Github" tab for right transition.', async ({ page }) => {
+  const gitHubLoc = page.getByLabel('GitHub page');
   
-  test('10. Check correctness of the "GitHub" integration in the footer' , async ({ page }) => {
-    await page.goto('https://playwright.dev/');
-    const page1Promise = page.waitForEvent('popup');
-    await page.getByRole('link', { name: 'GitHub', exact: true }).click();
-    const page1 = await page1Promise;
-    await expect(page1.getByText('microsoft / playwright Public')).toBeVisible();
-  });
+  await page.goto('/');
+  await gitHubLoc.click();
+  await expect(page.getByText('Star our repository jecfish/')).toBeVisible();
+  await page.getByRole('link', { name: 'jecfish/coffee-cart' }).click();
+  await expect(page.getByRole('banner').getByLabel('Homepage')).toBeVisible();
+});
+
+test('4. Adding process of goods to the cart', async ({ page }) => {
+
+  const cartPageLoc = page.getByLabel('Cart page');
+  const espressoLoc = page.locator('[data-test="Espresso"]');
+  const espressoMacchiatoLoc = page.locator('[data-test="Espresso_Machiato"]');
+  const cappuccinoLoc = page.locator('[data-test="Cappuccino"]');
+
+  await page.goto('/');
+  await expect(cartPageLoc).toBeVisible();
+  await expect(cartPageLoc).toContainText('cart (0)');
+  await espressoLoc.click();
+  await expect(cartPageLoc).toContainText('cart (1)');
+  await espressoMacchiatoLoc.click();
+  await expect(cartPageLoc).toContainText('cart (2)');
+  await cappuccinoLoc.click();
+  await expect(cartPageLoc).toContainText('cart (3)');
+});
+
+test('5. Visibility of modal window with additional promo action', async ({ page }) => {
+  const cappuccinoLoc = page.locator('[data-test="Cappuccino"]');
+  const cafeBrewLoc = page.locator('[data-test="Cafe_Breve"]');
+  const espressoMacchiatoLoc = page.locator('[data-test="Espresso_Macchiato"]');
+  
+  await page.goto('/');
+  await cappuccinoLoc.click();
+  await cafeBrewLoc.click();
+  await espressoMacchiatoLoc.click();
+  await expect(page.locator('#app')).toContainText('It\'s your lucky day! Get an extra cup of Mocha for $4.');
+});
+
+test('6. Adding into the cart, promo good with discounted value', async ({ page }) => {
+  const espressoLoc = page.locator('[data-test="Espresso"');
+  const flatWhiteLoc = page.locator('[data-test="Flat_White"]');
+  const cafeBrewLoc = page.locator('[data-test="Cafe_Breve"]');
+  const cartPageLoc = page.getByLabel('Cart page');
+
+  await page.goto('/');
+  await espressoLoc.click();
+  await flatWhiteLoc.click();
+  await cafeBrewLoc.click();
+  await expect(page.locator('#app')).toContainText('It\'s your lucky day! Get an extra cup of Mocha for $4.');
+  await page.getByRole('button', { name: 'Yes, of course!' }).click();
+  await cartPageLoc.click();
+  await expect(page.locator('#app')).toContainText('(Discounted) Mocha');
+});
+
+test('7. Declining to add promoted good into the cart', async ({ page }) => {
+  const checkoutPageLoc = page.locator('data-test="checkout"]');
+  const cartPageLoc = page.locator('[data-test="Cart page"]');
+  const cappuccinoLoc = page.locator('[data-test="Cart page"]');
+  const flatWhiteLoc = page.locator('[data-test="Flat_White"]');
+  const cafeLatteLoc = page.locator('[data-test="Cafe_Latte"]');
+
+  await page.goto('/');
+  await expect(checkoutPageLoc).toBeVisible();
+  await expect(cartPageLoc).toContainText('cart (0)');
+  await cappuccinoLoc.click();
+  await expect(cartPageLoc).toContainText('cart (1)');
+  await flatWhiteLoc.click();
+  await expect(cartPageLoc).toContainText('cart (2)');
+  await cafeLatteLoc.click();
+  await expect(cartPageLoc).toContainText('cart (3)');
+  await expect(page.getByText('It\'s your lucky day! Get an')).toBeVisible();
+  await page.getByRole('button', { name: 'Nah, I\'ll skip.' }).click();
+  await expect(cartPageLoc).toContainText('cart (3)');
+});
+
+test('8. Adding additional drink with the same name via cart', async ({ page }) => {
+  const checkoutLoc = page.locator('[data-test="checkout"]');
+  const espressoMacchiatoLoc= page.locator('[data-test="Espresso_Macchiato"]');
+  const cartPageLoc = page.getByLabel('Cart page');
+  let macchiatoCost = 12.00;
+  let totalSum = macchiatoCost *2 ;
+
+  await page.goto('/');
+  await expect(checkoutLoc).toBeVisible();
+  await expect(page.locator('li').filter({ hasText: 'cart (0)' })).toBeVisible();
+  await espressoMacchiatoLoc.click();
+  await expect(page.locator('li').filter({ hasText: 'cart (1)' })).toBeVisible();
+  await cartPageLoc.click();
+  await expect(checkoutLoc).toContainText(`Total: $${macchiatoCost}`);  //`Total: $12.00'`
+  await page.getByRole('button', { name: 'Add one Espresso Macchiato' }).click();
+  await expect(checkoutLoc).toContainText(`Total: $${totalSum.toFixed(2)}`);
+});
+
+test('9. Removing process from the cart via using "-" button', async ({ page }) => {
+  const cartPageLoc = page.getByLabel('Cart page');
+  const checkoutLoc = page.locator('[data-test="checkout"]');
+  const flatWhiteLoc = page.locator('[data-test="Flat_White"]');
+  let flatWhiteCost = 18.00;
+  
+  await page.goto('/');
+  await flatWhiteLoc.click();
+  await expect(page.locator('li').filter({ hasText: 'cart (1)' })).toBeVisible();
+  await cartPageLoc.click();
+  await page.getByRole('button', { name: 'Add one Flat White' }).click();
+  await expect(checkoutLoc).toContainText(`Total: $${flatWhiteCost*2}`);
+  await page.getByRole('button', { name: 'Remove one Flat White' }).click();
+  await expect(checkoutLoc).toContainText(`Total: $${flatWhiteCost}`);
+  await page.getByRole('button', { name: 'Remove one Flat White' }).click();
+  await expect(page.getByRole('paragraph')).toContainText('No coffee, go add some.');
+});
+
+test('10. Removing process from the cart via using "X" button', async ({ page }) => {
+  const espressoConPannaLoc = page.locator('[data-test="Espresso_Con Panna"]');
+  const cartPageLoc = page.getByLabel('Cart page');
+  
+  await page.goto('/');
+  await expect(page.locator('li').filter({ hasText: 'cart (0)' })).toBeVisible();
+  await espressoConPannaLoc.click();
+  await expect(page.locator('li').filter({ hasText: 'cart (1)' })).toBeVisible();
+  await cartPageLoc.click();
+  await page.getByLabel('Remove all Espresso Con Panna').click();
+  await expect(page.getByText('No coffee, go add some.')).toBeVisible();
+});
+
+test('11. Appearance of the "Payment details" modal window', async ({ page }) => {
+  const checkoutLoc = page.locator('[data-test="checkout"]');
+
+  await page.goto('/');
+  await expect(checkoutLoc).toBeVisible();
+  await checkoutLoc.click();
+  await expect(page.getByRole('heading', { name: 'Payment details' })).toBeVisible();
+});
+
+test('12. Submitting payment details', async ({ page }) => {
+  const checkoutLoc = page.locator('[data-test="checkout"]');
+  const submitButton = page.getByRole('button', { name: 'Submit' });
+
+  await page.goto('/');
+  await expect(checkoutLoc).toBeVisible();
+  await checkoutLoc.click();
+  await expect(page.getByRole('heading', { name: 'Payment details' })).toBeVisible();
+  await page.getByLabel('Name').fill('sammy');
+  await page.getByLabel('Email').fill('grog@proton.me');
+  await submitButton.click();
+});
