@@ -4,7 +4,7 @@ test('9. Removing process from the cart via using "-" button', async ({ page }) 
   const cartPageLoc = page.getByLabel('Cart page');
   const checkoutLoc = page.locator('[data-test="checkout"]');
   const flatWhiteLoc = page.locator('[data-test="Flat_White"]');
-  let flatWhiteCost = 18;
+  let flatWhiteCost = 18.00;
   
   await page.goto('/');
   await flatWhiteLoc.click();
