@@ -7,3 +7,4 @@ test('1. Visibility of cart active element on the page', async ({ page }) => {
   await cartPageLoc.click();
 });
 
+
