@@ -6,5 +6,5 @@ test('11. Appearance of the "Payment details" modal window', async ({ page }) =>
   await page.goto('/');
   await expect(checkoutLoc).toBeVisible();
   await checkoutLoc.click();
-  await expect(page.getByRole('heading', { name: 'Payment details' })).toBeVisible();
+  await expect(page.locator('h1:has-text("Payment details")')).toBeVisible();
 });

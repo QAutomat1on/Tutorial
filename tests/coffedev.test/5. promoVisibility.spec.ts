@@ -9,5 +9,5 @@ test('5. Visibility of modal window with additional promo action', async ({ page
   await cappuccinoLoc.click();
   await cafeBrewLoc.click();
   await espressoMacchiatoLoc.click();
-  await expect(page.locator('#app')).toContainText('It\'s your lucky day! Get an extra cup of Mocha for $4.');
+  await expect(page.locator('.promo')).toContainText('It\'s your lucky day! Get an extra cup of Mocha for $4.');
 });

@@ -1,12 +1,12 @@
 import { test, expect } from '@playwright/test';
 
 test('3. "Github" tab for right transition.', async ({ page }) => {
-  const gitHubLoc = page.getByLabel('GitHub page');
+  const gitHubLoc = page.locator('[href="/github"]');
   
   await page.goto('/');
   await gitHubLoc.click();
-  await expect(page.getByText('Star our repository jecfish/')).toBeVisible();
-  await page.getByRole('link', { name: 'jecfish/coffee-cart' }).click();
-  await expect(page.getByRole('banner').getByLabel('Homepage')).toBeVisible();
+  await expect(page.locator('.container:has-text("Star our repository ")')).toBeVisible();
+  await page.locator('[href="https://github.com/jecfish/coffee-cart"]').click();
+  await expect(page.locator('[href="/jecfish/coffee-cart"]').nth(0)).toBeVisible(); 
 });
 
